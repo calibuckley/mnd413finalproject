@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Impact</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        .intro-screen, .question-screen, .result-screen {
+            animation: fadeIn 0.6s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        .question {
+            font-size: 2rem;
+            margin-bottom: 50px;
+            font-weight: 300;
+        }
+        .choices {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .choice-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid white;
+            color: white;
+            padding: 40px 60px;
+            font-size: 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            min-width: 250px;
+        }
+        .choice-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .start-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 20px 60px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .progress {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        .impact-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+        }
+        .stat-large {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        }
+        .stat-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .comparison {
+            display: flex;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .comparison-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 15px;
+            min-width: 200px;
+        }
+        .good {
+            border: 3px solid #4ade80;
+        }
+        .bad {
+            border: 3px solid #f87171;
+        }
+        .restart-btn {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid white;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .restart-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+        .hidden {
+            display: none;
+        }
+        #visual-impact {
+            width: 100%;
+            max-width: 800px;
+            height: 400px;
+            margin: 30px 0;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB 0%, #1e3a5f 100%);
+            transition: background 1s ease;
+        }
+        .ocean-floor {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100px;
+            background: #2c1810;
+            border-radius: 50% 50% 0 0;
+        }
+        .trash-item {
+            position: absolute;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        .bottle {
+            width: 20px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 3px;
+        }
+        .bag {
+            width: 35px;
+            height: 35px;
+            background: rgba(200, 200, 200, 0.5);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+        .microplastic {
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 100, 100, 0.7);
+            border-radius: 50%;
+        }
+        .fabric-waste {
+            width: 30px;
+            height: 25px;
+            background: rgba(150, 100, 200, 0.6);
+            border-radius: 5px;
+        }
+        .smoke-cloud {
+            position: absolute;
+            width: 80px;
+            height: 50px;
+            background: rgba(100, 100, 100, 0.6);
+            border-radius: 50%;
+            animation: drift 5s ease-in-out infinite;
+        }
+        @keyframes drift {
+            0%, 100% { transform: translateX(0px); }
+            50% { transform: translateX(20px); }
+        }
+        .impact-message {
+            font-size: 1.8rem;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Intro Screen -->
+        <div id="intro" class="intro-screen">
+            <h1>🌍 Your Fashion Footprint</h1>
+            <p class="subtitle">Every choice has an impact. Let's discover yours.</p>
+            <button class="start-btn" onclick="startQuiz()">Start</button>
+        </div>
+
+        <!-- Question Screens -->
+        <div id="questions" class="question-screen hidden">
+            <div class="progress">Question <span id="current">1</span> of 3</div>
+            <h2 class="question" id="question-text"></h2>
+            <div class="choices" id="choices-container"></div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results" class="result-screen hidden">
+            <h1>Your Environmental Impact</h1>
+            
+            <div class="impact-message" id="impact-message"></div>
+            
+            <div id="visual-impact">
+                <div class="ocean-floor"></div>
+            </div>
+            
+            <div class="impact-card">
+                <div class="stat-large" id="total-water">0</div>
+                <div class="stat-label">Liters of Water Used</div>
+            </div>
+            <div class="impact-card">
+                <div class="stat-large" id="total-co2">0</div>
+                <div class="stat-label">kg of CO₂ Emitted</div>
+            </div>
+            <div class="impact-card">
+                <div class="stat-large" id="total-waste">0</div>
+                <div class="stat-label">kg of Textile Waste</div>
+            </div>
+            
+            <div class="comparison">
+                <div class="comparison-item" id="comparison-result"></div>
+            </div>
+            
+            <button class="restart-btn" onclick="restart()">Try Different Choices</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Where do you buy your clothes?",
+                choices: [
+                    { text: "Fast Fashion Store", water: 2700, co2: 25, waste: 1.5 },
+                    { text: "Thrift Store", water: 0, co2: 2, waste: 0 }
+                ]
+            },
+            {
+                question: "What fabric do you prefer?",
+                choices: [
+                    { text: "Synthetic (Polyester)", water: 1500, co2: 15, waste: 2 },
+                    { text: "Natural (Cotton/Linen)", water: 800, co2: 8, waste: 0.5 }
+                ]
+            },
+            {
+                question: "How long do you keep your clothes?",
+                choices: [
+                    { text: "Less than 1 year", water: 1000, co2: 10, waste: 3 },
+                    { text: "3+ years", water: 0, co2: 0, waste: 0 }
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let totalWater = 0;
+        let totalCO2 = 0;
+        let totalWaste = 0;
+
+        function startQuiz() {
+            document.getElementById('intro').classList.add('hidden');
+            document.getElementById('questions').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('current').textContent = currentQuestion + 1;
+            document.getElementById('question-text').textContent = q.question;
+            
+            const container = document.getElementById('choices-container');
+            container.innerHTML = '';
+            
+            q.choices.forEach((choice, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.textContent = choice.text;
+                btn.onclick = () => selectChoice(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectChoice(index) {
+            const choice = questions[currentQuestion].choices[index];
+            totalWater += choice.water;
+            totalCO2 += choice.co2;
+            totalWaste += choice.waste;
+            
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                setTimeout(() => {
+                    const questionsDiv = document.getElementById('questions');
+                    questionsDiv.style.animation = 'none';
+                    setTimeout(() => {
+                        questionsDiv.style.animation = 'fadeIn 0.6s ease';
+                        showQuestion();
+                    }, 10);
+                }, 200);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('questions').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            
+            // Generate visual impact first
+            generateVisualImpact();
+            
+            // Then animate numbers
+            animateNumber('total-water', totalWater);
+            animateNumber('total-co2', totalCO2);
+            animateNumber('total-waste', totalWaste);
+            
+            const comparisonDiv = document.getElementById('comparison-result');
+            const messageDiv = document.getElementById('impact-message');
+            
+            if (totalWater < 2000) {
+                comparisonDiv.className = 'comparison-item good';
+                comparisonDiv.innerHTML = '<strong>🌱 Great choices!</strong><br>You made eco-conscious decisions';
+                messageDiv.textContent = '🌊 The ocean stays clean thanks to your sustainable choices!';
+                messageDiv.style.color = '#4ade80';
+            } else if (totalWater < 4000) {
+                comparisonDiv.className = 'comparison-item';
+                comparisonDiv.innerHTML = '<strong>🤔 Mixed impact</strong><br>Some sustainable choices made';
+                messageDiv.textContent = '⚠️ Your choices are starting to pollute our planet...';
+                messageDiv.style.color = '#fbbf24';
+            } else {
+                comparisonDiv.className = 'comparison-item bad';
+                comparisonDiv.innerHTML = '<strong>⚠️ High impact</strong><br>Consider thrifting & sustainable options';
+                messageDiv.textContent = '🚨 This is what fast fashion does to our oceans and air!';
+                messageDiv.style.color = '#f87171';
+            }
+        }
+
+        function generateVisualImpact() {
+            const container = document.getElementById('visual-impact');
+            
+            // Clear previous items except ocean floor
+            const existingItems = container.querySelectorAll('.trash-item, .smoke-cloud');
+            existingItems.forEach(item => item.remove());
+            
+            // Calculate pollution level based on total impact
+            const pollutionLevel = Math.min(Math.floor((totalWater + totalCO2 * 10 + totalWaste * 100) / 300), 30);
+            
+            // Generate trash items
+            for (let i = 0; i < pollutionLevel; i++) {
+                const trashTypes = ['bottle', 'bag', 'microplastic', 'fabric-waste'];
+                const randomType = trashTypes[Math.floor(Math.random() * trashTypes.length)];
+                
+                const trash = document.createElement('div');
+                trash.className = 'trash-item ' + randomType;
+                trash.style.left = (Math.random() * 85 + 5) + '%';
+                trash.style.bottom = (Math.random() * 50 + 15) + '%';
+                trash.style.animationDelay = (Math.random() * 2) + 's';
+                
+                container.appendChild(trash);
+            }
+            
+            // Add smoke clouds for CO2
+            const smokeCount = Math.min(Math.floor(totalCO2 / 10), 5);
+            for (let i = 0; i < smokeCount; i++) {
+                const smoke = document.createElement('div');
+                smoke.className = 'smoke-cloud';
+                smoke.style.left = (Math.random() * 70 + 10) + '%';
+                smoke.style.top = (Math.random() * 30 + 10) + '%';
+                smoke.style.animationDelay = (Math.random() * 3) + 's';
+                
+                container.appendChild(smoke);
+            }
+            
+            // Change ocean color based on pollution
+            if (pollutionLevel > 20) {
+                container.style.background = 'linear-gradient(to bottom, #6b7280 0%, #1f2937 100%)';
+            } else if (pollutionLevel > 10) {
+                container.style.background = 'linear-gradient(to bottom, #60a5fa 0%, #374151 100%)';
+            } else {
+                container.style.background = 'linear-gradient(to bottom, #87CEEB 0%, #1e3a5f 100%)';
+            }
+        }
+
+        function animateNumber(elementId, finalValue) {
+            const element = document.getElementById(elementId);
+            let current = 0;
+            const increment = finalValue / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalValue) {
+                    element.textContent = Math.round(finalValue).toLocaleString();
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.round(current).toLocaleString();
+                }
+            }, 20);
+        }
+
+        function restart() {
+            currentQuestion = 0;
+            totalWater = 0;
+            totalCO2 = 0;
+            totalWaste = 0;
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('intro').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
