@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Fashion Choices: The Hidden Impact</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            overflow-x: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Animated Background that responds to choices */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            transition: all 2s ease;
+        }
+
+        /* Initial clean state */
+        .bg-clean {
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc1 50%, #ffd3b6 100%);
+        }
+
+        /* Polluted state for fast fashion choices */
+        .bg-polluted {
+            background: linear-gradient(135deg, #545454 0%, #7a7a7a 50%, #434343 100%);
+        }
+
+
+
+        /* Pollution particles */
+        .pollution-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .pollution-overlay.active {
+            opacity: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(80, 80, 80, 0.4);
+            border-radius: 50%;
+            animation: float 4s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-20px) translateX(10px); }
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .screen {
+            max-width: 800px;
+            width: 100%;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            color: #2c3e50;
+        }
+
+        .narrative-text {
+            font-size: 1.4rem;
+            line-height: 1.8;
+            margin: 30px 0;
+            color: #34495e;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .choices {
+            display: flex;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .choice-btn {
+            background: white;
+            border: 3px solid #3498db;
+            padding: 30px 40px;
+            font-size: 1.3rem;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-width: 250px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            background: #3498db;
+            color: white;
+        }
+
+        .choice-btn.fast-fashion {
+            border-color: #e74c3c;
+        }
+
+        .choice-btn.fast-fashion:hover {
+            background: #e74c3c;
+        }
+
+        .choice-btn.sustainable {
+            border-color: #27ae60;
+        }
+
+        .choice-btn.sustainable:hover {
+            background: #27ae60;
+        }
+
+        /* Progress indicator */
+        .progress {
+            margin: 20px 0;
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+
+        /* Results Screen */
+        .impact-stat {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .impact-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .impact-number.bad {
+            color: #e74c3c;
+        }
+
+        .impact-number.good {
+            color: #27ae60;
+        }
+
+        .impact-label {
+            font-size: 1.2rem;
+            color: #34495e;
+        }
+
+        .comparison {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-style: italic;
+            color: #2c3e50;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            margin-top: 30px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Environmental particles for thrift choices */
+        .leaf {
+            position: absolute;
+            font-size: 2rem;
+            animation: fall 5s infinite;
+            opacity: 0;
+        }
+
+        @keyframes fall {
+            0% { 
+                top: -10%; 
+                opacity: 0;
+                transform: rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+            }
+            100% { 
+                top: 110%; 
+                opacity: 0;
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-background bg-clean" id="background"></div>
+
+    <!-- Pollution Overlay -->
+    <div class="pollution-overlay" id="pollutionOverlay"></div>
+
+    <div class="container">
+        <!-- Intro Screen -->
+        <div class="screen" id="introScreen">
+            <h1>Your Fashion Choices</h1>
+            <div class="narrative-text">
+                It's Saturday morning. You're scrolling through Instagram, and your feed is filled with cute outfits. You've been eyeing a few pieces all week, and today feels like the perfect day to treat yourself.
+                <br><br>
+                But here's the thing: <strong>every choice you make leaves a mark on our planet.</strong>
+                <br><br>
+                Let's walk through your shopping day together and see the real impact of your decisions.
+            </div>
+            <button class="start-btn" onclick="startGame()">Start Your Shopping Day</button>
+        </div>
+
+        <!-- Question Screens -->
+        <div class="screen hidden" id="question1">
+            <div class="progress">Decision 1 of 4</div>
+            <h1>Where are you shopping?</h1>
+            <div class="narrative-text">
+                You're ready to update your wardrobe. You could hit up the mall where that fast fashion store is having a huge sale—50% off everything! Or... your roommate mentioned a really cool thrift shop downtown that just got in new inventory.
+            </div>
+            <div class="choices">
+                <button class="choice-btn fast-fashion" onclick="makeChoice(1, 'fast')">
+                    Fast Fashion Store<br>
+                    <small>(It's so convenient!)</small>
+                </button>
+                <button class="choice-btn sustainable" onclick="makeChoice(1, 'thrift')">
+                    Local Thrift Shop<br>
+                    <small>(Let's treasure hunt!)</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="screen hidden" id="question2">
+            <div class="progress">Decision 2 of 4</div>
+            <h1>What are you buying?</h1>
+            <div class="narrative-text" id="q2narrative"></div>
+            <div class="choices">
+                <button class="choice-btn fast-fashion" onclick="makeChoice(2, 'fast')">
+                    New Trendy Pieces<br>
+                    <small>(Gotta stay current!)</small>
+                </button>
+                <button class="choice-btn sustainable" onclick="makeChoice(2, 'thrift')">
+                    Classic Timeless Items<br>
+                    <small>(Quality over trends)</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="screen hidden" id="question3">
+            <div class="progress">Decision 3 of 4</div>
+            <h1>How much are you getting?</h1>
+            <div class="narrative-text" id="q3narrative"></div>
+            <div class="choices">
+                <button class="choice-btn fast-fashion" onclick="makeChoice(3, 'fast')">
+                    Shopping Haul (5-7 items)<br>
+                    <small>(More is more!)</small>
+                </button>
+                <button class="choice-btn sustainable" onclick="makeChoice(3, 'thrift')">
+                    Just What You Need (2-3 items)<br>
+                    <small>(Intentional shopping)</small>
+                </button>
+            </div>
+        </div>
+
+        <div class="screen hidden" id="question4">
+            <div class="progress">Decision 4 of 4</div>
+            <h1>What happens when you're done with them?</h1>
+            <div class="narrative-text" id="q4narrative"></div>
+            <div class="choices">
+                <button class="choice-btn fast-fashion" onclick="makeChoice(4, 'fast')">
+                    Toss When Worn Out<br>
+                    <small>(They weren't expensive anyway)</small>
+                </button>
+                <button class="choice-btn sustainable" onclick="makeChoice(4, 'thrift')">
+                    Donate or Resell<br>
+                    <small>(Someone else will love these!)</small>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="screen hidden" id="resultsScreen">
+            <h1>Your Impact Today</h1>
+            <div class="narrative-text">
+                Your shopping day is over. Here's what your choices just did to our planet...
+            </div>
+
+            <div class="impact-stat">
+                <div class="impact-label">Water Used</div>
+                <div class="impact-number" id="waterImpact">0</div>
+                <div class="comparison" id="waterComparison"></div>
+            </div>
+
+            <div class="impact-stat">
+                <div class="impact-label">CO₂ Emissions</div>
+                <div class="impact-number" id="co2Impact">0</div>
+                <div class="comparison" id="co2Comparison"></div>
+            </div>
+
+            <div class="impact-stat">
+                <div class="impact-label">Waste Generated</div>
+                <div class="impact-number" id="wasteImpact">0</div>
+                <div class="comparison" id="wasteComparison"></div>
+            </div>
+
+            <div class="narrative-text" id="finalMessage" style="margin-top: 40px;"></div>
+
+            <button class="start-btn" onclick="location.reload()">Shop Again (Make Different Choices)</button>
+        </div>
+    </div>
+
+    <script>
+        let choices = {
+            q1: null,
+            q2: null,
+            q3: null,
+            q4: null
+        };
+
+        let pollutionLevel = 0;
+        let sustainableChoices = 0;
+
+        function startGame() {
+            document.getElementById('introScreen').classList.add('hidden');
+            document.getElementById('question1').classList.remove('hidden');
+        }
+
+        function makeChoice(questionNum, type) {
+            choices['q' + questionNum] = type;
+            
+            if (type === 'fast') {
+                pollutionLevel++;
+                addPollution();
+            } else {
+                sustainableChoices++;
+                addLeaves();
+            }
+
+            // Update environment based on choices
+            updateEnvironment();
+
+            // Move to next screen
+            if (questionNum < 4) {
+                document.getElementById('question' + questionNum).classList.add('hidden');
+                
+                // Update narrative for next question
+                updateNarrative(questionNum + 1);
+                
+                document.getElementById('question' + (questionNum + 1)).classList.remove('hidden');
+            } else {
+                // Show results
+                calculateResults();
+            }
+        }
+
+        function updateNarrative(nextQ) {
+            const narratives = {
+                2: {
+                    fast: "You're walking through the fast fashion store. Everything is so cheap and trendy! The latest styles are calling your name.",
+                    thrift: "You're browsing through racks of unique pieces. Each item has a story. Something catches your eye—vintage, well-made, and one-of-a-kind."
+                },
+                3: {
+                    fast: "Your cart is getting full. The prices are so low, why not get a few more? After all, you 'need' options, right?",
+                    thrift: "You've found some great pieces. You're trying to be intentional—do you really need all of this, or should you stick to what you'll actually wear?"
+                },
+                4: {
+                    fast: "Fast forward 6 months. Some pieces barely lasted a few washes. The trends have changed anyway. What do you do with them?",
+                    thrift: "A year later. You're still wearing these pieces, but you've gotten some new things and your closet is full. What happens to these clothes?"
+                }
+            };
+
+            const previousChoice = choices['q' + (nextQ - 1)];
+            document.getElementById('q' + nextQ + 'narrative').textContent = narratives[nextQ][previousChoice];
+        }
+
+        function updateEnvironment() {
+            const background = document.getElementById('background');
+            const overlay = document.getElementById('pollutionOverlay');
+
+            if (pollutionLevel > sustainableChoices) {
+                background.classList.remove('bg-clean');
+                background.classList.add('bg-polluted');
+                overlay.classList.add('active');
+            }
+        }
+
+        function addPollution() {
+            const overlay = document.getElementById('pollutionOverlay');
+            for (let i = 0; i < 3; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 20 + 10 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                overlay.appendChild(particle);
+            }
+        }
+
+        function addLeaves() {
+            const leaves = ['🌿', '🍃', '🌱'];
+            for (let i = 0; i < 2; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.textContent = leaves[Math.floor(Math.random() * leaves.length)];
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(leaf);
+                
+                setTimeout(() => leaf.remove(), 5000);
+            }
+        }
+
+        function calculateResults() {
+            document.getElementById('question4').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+
+            // Calculate impact based on choices
+            let waterLiters = 0;
+            let co2Kg = 0;
+            let wasteKg = 0;
+
+            // Q1: Store choice
+            if (choices.q1 === 'fast') {
+                waterLiters += 2700; // Water for cotton production
+                co2Kg += 25;
+                wasteKg += 5;
+            } else {
+                waterLiters += 50; // Minimal for secondhand
+                co2Kg += 2;
+                wasteKg += 0.2;
+            }
+
+            // Q2: Item type
+            if (choices.q2 === 'fast') {
+                waterLiters += 1800;
+                co2Kg += 20;
+                wasteKg += 3;
+            } else {
+                waterLiters += 30;
+                co2Kg += 1;
+                wasteKg += 0.1;
+            }
+
+            // Q3: Quantity
+            if (choices.q3 === 'fast') {
+                waterLiters += 5400; // 6 items average
+                co2Kg += 150;
+                wasteKg += 18;
+            } else {
+                waterLiters += 100; // 2-3 items
+                co2Kg += 5;
+                wasteKg += 0.5;
+            }
+
+            // Q4: End of life
+            if (choices.q4 === 'fast') {
+                wasteKg += 15; // Landfill impact
+                co2Kg += 30; // Decomposition emissions
+            } else {
+                wasteKg -= 5; // Offset by extending lifecycle
+                co2Kg -= 10;
+            }
+
+            // Display results with animation
+            const waterEl = document.getElementById('waterImpact');
+            const co2El = document.getElementById('co2Impact');
+            const wasteEl = document.getElementById('wasteImpact');
+
+            waterEl.textContent = waterLiters.toLocaleString() + ' liters';
+            co2El.textContent = co2Kg.toLocaleString() + ' kg';
+            wasteEl.textContent = wasteKg.toFixed(1) + ' kg';
+
+            // Color based on impact
+            if (sustainableChoices > pollutionLevel) {
+                waterEl.classList.add('good');
+                co2El.classList.add('good');
+                wasteEl.classList.add('good');
+            } else {
+                waterEl.classList.add('bad');
+                co2El.classList.add('bad');
+                wasteEl.classList.add('bad');
+            }
+
+            // Add comparisons
+            document.getElementById('waterComparison').textContent = 
+                `That's enough water to fill ${Math.round(waterLiters / 250)} bathtubs`;
+            
+            document.getElementById('co2Comparison').textContent = 
+                `Equal to driving ${Math.round(co2Kg * 2.5)} miles in a car`;
+            
+            document.getElementById('wasteComparison').textContent = 
+                `That's ${Math.round(wasteKg / 0.3)} t-shirts worth of textile waste`;
+
+            // Final message
+            const finalMsg = document.getElementById('finalMessage');
+            if (sustainableChoices >= 3) {
+                finalMsg.innerHTML = `
+                    <strong>Amazing job! 🌍</strong><br>
+                    You made ${sustainableChoices} sustainable choices today. By choosing secondhand and being intentional, 
+                    you've significantly reduced your environmental impact. If everyone shopped like you, we'd save millions 
+                    of gallons of water and keep tons of textiles out of landfills each year.
+                    <br><br>
+                    <em>Your choices really do matter.</em>
+                `;
+                finalMsg.style.background = 'rgba(39, 174, 96, 0.1)';
+            } else {
+                finalMsg.innerHTML = `
+                    <strong>Here's the truth...</strong><br>
+                    Your choices today added ${waterLiters.toLocaleString()} liters of water usage, 
+                    ${co2Kg} kg of CO₂ emissions, and ${wasteKg.toFixed(1)} kg of waste to our planet. 
+                    <br><br>
+                    But here's the good news: <strong>if you'd chosen thrift at every step</strong>, you could have 
+                    reduced this impact by up to 95%. That's ${Math.round(waterLiters * 0.95).toLocaleString()} liters 
+                    of water saved, and ${Math.round(co2Kg * 0.95)} kg less CO₂ in our atmosphere.
+                    <br><br>
+                    <em>Every choice is a chance to do better.</em>
+                `;
+                finalMsg.style.background = 'rgba(231, 76, 60, 0.1)';
+            }
+        }
+    </script>
+</body>
+</html>
